@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import com.donkingliang.imageselectdemo.adapter.ImageAdapter;
-import com.donkingliang.imageselector.utils.ImageSelector;
+import com.donkingliang.imageselector.utils.MultiSelector;
 
 import java.util.ArrayList;
 
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (hasWriteExternalPermission == PackageManager.PERMISSION_GRANTED) {
             //预加载手机图片。加载图片前，请确保app有读取储存卡权限
-            ImageSelector.preload(this);
+            MultiSelector.preload(this);
         } else {
             //没有权限，申请权限。
             ActivityCompat.requestPermissions(this,
@@ -59,10 +59,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE && data != null) {
-            ArrayList<String> images = data.getStringArrayListExtra(ImageSelector.SELECT_RESULT);
-            boolean isCameraImage = data.getBooleanExtra(ImageSelector.IS_CAMERA_IMAGE, false);
-//            Log.d("ImageSelector", "是否是拍照图片：" + isCameraImage);
-            mAdapter.refresh(images);
+            ArrayList<String> images = data.getStringArrayListExtra(MultiSelector.SELECT_RESULT);
+            boolean isCameraImage = data.getBooleanExtra(MultiSelector.IS_FROM_CAMERA, false);
+//            Log.d("MultiSelector", "是否是拍照图片：" + isCameraImage);
+            //mAdapter.refresh(images);
         }
     }
 
@@ -75,11 +75,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_WRITE_EXTERNAL_REQUEST_CODE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //预加载手机图片
-                ImageSelector.preload(this);
+                MultiSelector.preload(this);
             } else {
                 //拒绝权限。
             }
@@ -91,58 +92,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.btn_single:
                 //单选
-                ImageSelector.builder()
+                MultiSelector.builder()
                         .useCamera(true) // 设置是否使用拍照
                         .setSingle(true)  //设置是否单选
                         .canPreview(true) //是否点击放大图片查看,，默认为true
-                        .start(this, REQUEST_CODE); // 打开相册
+                        .start(this, MultiSelector.SELECT_TYPE_IMAGE, REQUEST_CODE); // 打开相册
                 break;
 
             case R.id.btn_limit:
                 //多选(最多9张)
-                ImageSelector.builder()
+                MultiSelector.builder()
                         .useCamera(true) // 设置是否使用拍照
                         .setSingle(false)  //设置是否单选
                         .canPreview(true) //是否点击放大图片查看,，默认为true
                         .setMaxSelectCount(9) // 图片的最大选择数量，小于等于0时，不限数量。
-                        .start(this, REQUEST_CODE); // 打开相册
+                        //.start(this, MultiSelector.SELECT_TYPE_IMAGE, REQUEST_CODE); // 打开相册
+                        //.start(this, MultiSelector.SELECT_TYPE_VIDEO, REQUEST_CODE); // 打开相册
+                        .start(this, MultiSelector.SELECT_TYPE_DOCUMENT, REQUEST_CODE);
+                        //.start(this, MultiSelector.SELECT_TYPE_AUDIO, REQUEST_CODE);
                 break;
 
             case R.id.btn_unlimited:
                 //多选(不限数量)
-                ImageSelector.builder()
+                MultiSelector.builder()
                         .useCamera(true) // 设置是否使用拍照
                         .setSingle(false)  //设置是否单选
                         .canPreview(true) //是否点击放大图片查看,，默认为true
                         .setMaxSelectCount(0) // 图片的最大选择数量，小于等于0时，不限数量。
-                        .start(this, REQUEST_CODE); // 打开相册
+                        .start(this, MultiSelector.SELECT_TYPE_IMAGE, REQUEST_CODE); // 打开相册
                 break;
 
             case R.id.btn_clip:
                 //单选并剪裁
-                ImageSelector.builder()
+                MultiSelector.builder()
                         .useCamera(true) // 设置是否使用拍照
                         .setCrop(true)  // 设置是否使用图片剪切功能。
                         .setCropRatio(1.0f) // 图片剪切的宽高比,默认1.0f。宽固定为手机屏幕的宽。
                         .setSingle(true)  //设置是否单选
                         .canPreview(true) //是否点击放大图片查看,，默认为true
-                        .start(this, REQUEST_CODE); // 打开相册
+                        .start(this, MultiSelector.SELECT_TYPE_IMAGE, REQUEST_CODE); // 打开相册
                 break;
 
             case R.id.btn_only_take:
                 //仅拍照
-                ImageSelector.builder()
+                MultiSelector.builder()
                         .onlyTakePhoto(true)  // 仅拍照，不打开相册
-                        .start(this, REQUEST_CODE);
+                        .start(this, MultiSelector.SELECT_TYPE_IMAGE, REQUEST_CODE);
                 break;
 
             case R.id.btn_take_and_clip:
                 //拍照并剪裁
-                ImageSelector.builder()
+                MultiSelector.builder()
                         .setCrop(true) // 设置是否使用图片剪切功能。
                         .setCropRatio(1.0f) // 图片剪切的宽高比,默认1.0f。宽固定为手机屏幕的宽。
                         .onlyTakePhoto(true)  // 仅拍照，不打开相册
-                        .start(this, REQUEST_CODE);
+                        .start(this, MultiSelector.SELECT_TYPE_IMAGE, REQUEST_CODE);
                 break;
         }
     }

@@ -13,7 +13,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.donkingliang.imageselector.R;
 import com.donkingliang.imageselector.entry.Folder;
-import com.donkingliang.imageselector.entry.Image;
+import com.donkingliang.imageselector.entry.FileData;
 import com.donkingliang.imageselector.utils.VersionUtils;
 
 import java.util.ArrayList;
@@ -26,11 +26,13 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ViewHolder
     private int mSelectItem;
     private OnFolderSelectListener mListener;
     private boolean isAndroidQ = VersionUtils.isAndroidQ();
+    private int numberFormat;
 
-    public FolderAdapter(Context context, ArrayList<Folder> folders) {
+    public FolderAdapter(Context context, ArrayList<Folder> folders, int numRes) {
         mContext = context;
         mFolders = folders;
         this.mInflater = LayoutInflater.from(context);
+        numberFormat = numRes;
     }
 
     @Override
@@ -42,23 +44,25 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final Folder folder = mFolders.get(position);
-        ArrayList<Image> images = folder.getImages();
+        ArrayList<FileData> fileData = folder.getFiles();
         holder.tvFolderName.setText(folder.getName());
         holder.ivSelect.setVisibility(mSelectItem == position ? View.VISIBLE : View.GONE);
-        if (images != null && !images.isEmpty()) {
-            holder.tvFolderSize.setText(mContext.getString(R.string.selector_image_num,images.size()));
-            Glide.with(mContext).load(isAndroidQ ? images.get(0).getUri() : images.get(0).getPath())
+        if (fileData != null && !fileData.isEmpty()) {
+            //holder.tvFolderSize.setText(mContext.getString(R.string.selector_image_num, fileData.size()));
+            holder.tvFolderSize.setText(mContext.getString(numberFormat, fileData.size()));
+            Glide.with(mContext).load(isAndroidQ ? fileData.get(0).getUri() : fileData.get(0).getPath())
                     .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
                     .into(holder.ivImage);
         } else {
-            holder.tvFolderSize.setText(mContext.getString(R.string.selector_image_num,0));
+            //holder.tvFolderSize.setText(mContext.getString(R.string.selector_image_num,0));
+            holder.tvFolderSize.setText(mContext.getString(numberFormat,0));
             holder.ivImage.setImageBitmap(null);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSelectItem = holder.getAdapterPosition();
+                mSelectItem = holder.getAbsoluteAdapterPosition();// holder.getAdapterPosition();
                 notifyDataSetChanged();
                 if (mListener != null) {
                     mListener.OnFolderSelect(folder);

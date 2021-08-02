@@ -11,5 +11,15 @@
     <string name="selector_confirm">Confirm</string>
     <string name="selector_cancel">Cancel</string>
     <string name="selector_hint">Hint</string>
-    <string name="selector_permissions_hint">This album needs to be granted access to storage and photos, please go to Settings > App > Permissions to configure permissions.</string>
+    <string name="selector_image_permissions_hint">This album needs to be granted access to storage and photos, please go to Settings > App > Permissions to configure permissions.</string>
+    <string name="selector_all_video">All Videos</string>
+    <string name="selector_all_audio">All Audios</string>
+    <string name="selector_video_permissions_hint">Viewing videos requires access to storage and cameras, please go to Settings > App > Permissions to configure permissions.</string>
+    <string name="selector_audio_permission_hint">Viewing audio requires access to storage, please go to Settings > App > Permissions to configure permissions.</string>
+    <string name="selector_document_permissions_hint">Viewing a document requires access to the storage, please go to Settings > App > Permissions to configure permissions.</string>
+    <string name="selector_video">Videos</string>
+    <string name="selector_audio">Audios</string>
+    <string name="selector_document">Documents</string>
+    <string name="selector_all_document">All Documents</string>
+    <string name="selector_file_num">%d</string>
 </resources>

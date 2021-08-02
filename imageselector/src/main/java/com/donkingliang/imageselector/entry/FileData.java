@@ -7,15 +7,16 @@ import android.os.Parcelable;
 /**
  *图片实体类
  */
-public class Image implements Parcelable {
+public class FileData implements Parcelable {
 
     private String path;
     private long time;
     private String name;
     private String mimeType;
     private Uri uri;
+    private long duration;
 
-    public Image(String path, long time, String name, String mimeType, Uri uri) {
+    public FileData(String path, long time, String name, String mimeType, Uri uri) {
         this.path = path;
         this.time = time;
         this.name = name;
@@ -67,6 +68,11 @@ public class Image implements Parcelable {
         return "image/gif".equals(mimeType);
     }
 
+    public long getDuration(){return duration;}
+
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
 
     @Override
     public int describeContents() {
@@ -82,7 +88,7 @@ public class Image implements Parcelable {
         dest.writeParcelable(this.uri, flags);
     }
 
-    protected Image(Parcel in) {
+    protected FileData(Parcel in) {
         this.path = in.readString();
         this.time = in.readLong();
         this.name = in.readString();
@@ -90,15 +96,15 @@ public class Image implements Parcelable {
         this.uri = in.readParcelable(Uri.class.getClassLoader());
     }
 
-    public static final Creator<Image> CREATOR = new Creator<Image>() {
+    public static final Creator<FileData> CREATOR = new Creator<FileData>() {
         @Override
-        public Image createFromParcel(Parcel source) {
-            return new Image(source);
+        public FileData createFromParcel(Parcel source) {
+            return new FileData(source);
         }
 
         @Override
-        public Image[] newArray(int size) {
-            return new Image[size];
+        public FileData[] newArray(int size) {
+            return new FileData[size];
         }
     };
 }

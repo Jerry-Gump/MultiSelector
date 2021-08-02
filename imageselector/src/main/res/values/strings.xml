@@ -11,5 +11,15 @@
     <string name="selector_confirm">确定</string>
     <string name="selector_cancel">取消</string>
     <string name="selector_hint">提示</string>
-    <string name="selector_permissions_hint">该相册需要赋予访问存储和拍照的权限，请到“设置”>“应用”>“权限”中配置权限。</string>
+    <string name="selector_image_permissions_hint">该相册需要赋予访问存储和拍照的权限，请到“设置”>“应用”>“权限”中配置权限。</string>
+    <string name="selector_all_video">全部视频</string>
+    <string name="selector_all_audio">全部音频</string>
+    <string name="selector_video_permissions_hint">查看视频需要赋予访问存储和相机的权限，请到“设置”>“应用”>“权限”中配置权限。</string>
+    <string name="selector_audio_permission_hint">查看音频需要赋予访问存储的权限，请到“设置”>“应用”>“权限”中配置权限。</string>
+    <string name="selector_document_permissions_hint">查看文档需要赋予访问存储的权限，请到“设置”>“应用”>“权限”中配置权限。</string>
+    <string name="selector_video">视频</string>
+    <string name="selector_audio">音频</string>
+    <string name="selector_document">文档</string>
+    <string name="selector_all_document">全部文件</string>
+    <string name="selector_file_num">%d个</string>
 </resources>

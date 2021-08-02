@@ -38,7 +38,7 @@ Android图片选择器，仿微信的图片选择器的样式和效果。支持�
     android:configChanges="orientation|keyboardHidden|screenSize"/>
     
 //图片预览Activity
-<activity android:name="com.donkingliang.imageselector.PreviewActivity"
+<activity android:name="com.donkingliang.imageselector.ImagePreviewActivity"
     android:theme="@style/Theme.AppCompat.Light.NoActionBar"
     android:configChanges="orientation|keyboardHidden|screenSize"/>
 

@@ -24,8 +24,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.donkingliang.imageselector.adapter.ImagePagerAdapter;
-import com.donkingliang.imageselector.entry.Image;
-import com.donkingliang.imageselector.utils.ImageSelector;
+import com.donkingliang.imageselector.entry.FileData;
+import com.donkingliang.imageselector.utils.MultiSelector;
 import com.donkingliang.imageselector.utils.VersionUtils;
 import com.donkingliang.imageselector.view.MyViewPager;
 
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 import static android.animation.ObjectAnimator.ofFloat;
 
-public class PreviewActivity extends AppCompatActivity {
+public class ImagePreviewActivity extends AppCompatActivity {
 
     private MyViewPager vpImage;
     private TextView tvIndicator;
@@ -46,11 +46,11 @@ public class PreviewActivity extends AppCompatActivity {
     //tempImages和tempSelectImages用于图片列表数据的页面传输。
     //之所以不要Intent传输这两个图片列表，因为要保证两位页面操作的是同一个列表数据，同时可以避免数据量大时，
     // 用Intent传输发生的错误问题。
-    private static ArrayList<Image> tempImages;
-    private static ArrayList<Image> tempSelectImages;
+    private static ArrayList<FileData> tempFileData;
+    private static ArrayList<FileData> tempSelectFileData;
 
-    private ArrayList<Image> mImages;
-    private ArrayList<Image> mSelectImages;
+    private ArrayList<FileData> mFileData;
+    private ArrayList<FileData> mSelectFileData;
     private boolean isShowBar = true;
     private boolean isConfirm = false;
     private boolean isSingle;
@@ -59,16 +59,16 @@ public class PreviewActivity extends AppCompatActivity {
     private BitmapDrawable mSelectDrawable;
     private BitmapDrawable mUnSelectDrawable;
 
-    public static void openActivity(Activity activity, ArrayList<Image> images,
-                                    ArrayList<Image> selectImages, boolean isSingle,
+    public static void openActivity(Activity activity, ArrayList<FileData> fileData,
+                                    ArrayList<FileData> selectFileData, boolean isSingle,
                                     int maxSelectCount, int position) {
-        tempImages = images;
-        tempSelectImages = selectImages;
-        Intent intent = new Intent(activity, PreviewActivity.class);
-        intent.putExtra(ImageSelector.MAX_SELECT_COUNT, maxSelectCount);
-        intent.putExtra(ImageSelector.IS_SINGLE, isSingle);
-        intent.putExtra(ImageSelector.POSITION, position);
-        activity.startActivityForResult(intent, ImageSelector.RESULT_CODE);
+        tempFileData = fileData;
+        tempSelectFileData = selectFileData;
+        Intent intent = new Intent(activity, ImagePreviewActivity.class);
+        intent.putExtra(MultiSelector.MAX_SELECT_COUNT, maxSelectCount);
+        intent.putExtra(MultiSelector.IS_SINGLE, isSingle);
+        intent.putExtra(MultiSelector.POSITION, position);
+        activity.startActivityForResult(intent, MultiSelector.RESULT_CODE);
     }
 
     @Override
@@ -85,14 +85,14 @@ public class PreviewActivity extends AppCompatActivity {
         }
 
         setStatusBarVisible(true);
-        mImages = tempImages;
-        tempImages = null;
-        mSelectImages = tempSelectImages;
-        tempSelectImages = null;
+        mFileData = tempFileData;
+        tempFileData = null;
+        mSelectFileData = tempSelectFileData;
+        tempSelectFileData = null;
 
         Intent intent = getIntent();
-        mMaxCount = intent.getIntExtra(ImageSelector.MAX_SELECT_COUNT, 0);
-        isSingle = intent.getBooleanExtra(ImageSelector.IS_SINGLE, false);
+        mMaxCount = intent.getIntExtra(MultiSelector.MAX_SELECT_COUNT, 0);
+        isSingle = intent.getBooleanExtra(MultiSelector.IS_SINGLE, false);
 
         Resources resources = getResources();
         Bitmap selectBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_image_select);
@@ -108,9 +108,9 @@ public class PreviewActivity extends AppCompatActivity {
         initListener();
         initViewPager();
 
-        tvIndicator.setText(1 + "/" + mImages.size());
-        changeSelect(mImages.get(0));
-        vpImage.setCurrentItem(intent.getIntExtra(ImageSelector.POSITION, 0));
+        tvIndicator.setText(1 + "/" + mFileData.size());
+        changeSelect(mFileData.get(0));
+        vpImage.setCurrentItem(intent.getIntExtra(MultiSelector.POSITION, 0));
     }
 
     private void initView() {
@@ -153,11 +153,11 @@ public class PreviewActivity extends AppCompatActivity {
      * 初始化ViewPager
      */
     private void initViewPager() {
-        ImagePagerAdapter adapter = new ImagePagerAdapter(this, mImages);
+        ImagePagerAdapter adapter = new ImagePagerAdapter(this, mFileData);
         vpImage.setAdapter(adapter);
         adapter.setOnItemClickListener(new ImagePagerAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(int position, Image image) {
+            public void onItemClick(int position, FileData fileData) {
                 if (isShowBar) {
                     hideBar();
                 } else {
@@ -172,8 +172,8 @@ public class PreviewActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                tvIndicator.setText(position + 1 + "/" + mImages.size());
-                changeSelect(mImages.get(position));
+                tvIndicator.setText(position + 1 + "/" + mFileData.size());
+                changeSelect(mFileData.get(position));
             }
 
             @Override
@@ -285,24 +285,24 @@ public class PreviewActivity extends AppCompatActivity {
 
     private void clickSelect() {
         int position = vpImage.getCurrentItem();
-        if (mImages != null && mImages.size() > position) {
-            Image image = mImages.get(position);
-            if (mSelectImages.contains(image)) {
-                mSelectImages.remove(image);
+        if (mFileData != null && mFileData.size() > position) {
+            FileData fileData = mFileData.get(position);
+            if (mSelectFileData.contains(fileData)) {
+                mSelectFileData.remove(fileData);
             } else if (isSingle) {
-                mSelectImages.clear();
-                mSelectImages.add(image);
-            } else if (mMaxCount <= 0 || mSelectImages.size() < mMaxCount) {
-                mSelectImages.add(image);
+                mSelectFileData.clear();
+                mSelectFileData.add(fileData);
+            } else if (mMaxCount <= 0 || mSelectFileData.size() < mMaxCount) {
+                mSelectFileData.add(fileData);
             }
-            changeSelect(image);
+            changeSelect(fileData);
         }
     }
 
-    private void changeSelect(Image image) {
-        tvSelect.setCompoundDrawables(mSelectImages.contains(image) ?
+    private void changeSelect(FileData fileData) {
+        tvSelect.setCompoundDrawables(mSelectFileData.contains(fileData) ?
                 mSelectDrawable : mUnSelectDrawable, null, null, null);
-        setSelectImageCount(mSelectImages.size());
+        setSelectImageCount(mSelectFileData.size());
     }
 
     private void setSelectImageCount(int count) {
@@ -325,8 +325,8 @@ public class PreviewActivity extends AppCompatActivity {
     public void finish() {
         //Activity关闭时，通过Intent把用户的操作(确定/返回)传给ImageSelectActivity。
         Intent intent = new Intent();
-        intent.putExtra(ImageSelector.IS_CONFIRM, isConfirm);
-        setResult(ImageSelector.RESULT_CODE, intent);
+        intent.putExtra(MultiSelector.IS_CONFIRM, isConfirm);
+        setResult(MultiSelector.RESULT_CODE, intent);
         super.finish();
     }
 }

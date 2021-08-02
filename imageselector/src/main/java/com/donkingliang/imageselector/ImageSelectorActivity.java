@@ -40,12 +40,13 @@ import android.widget.TextView;
 
 import com.donkingliang.imageselector.adapter.FolderAdapter;
 import com.donkingliang.imageselector.adapter.ImageAdapter;
+import com.donkingliang.imageselector.entry.FileData;
 import com.donkingliang.imageselector.entry.Folder;
-import com.donkingliang.imageselector.entry.Image;
 import com.donkingliang.imageselector.entry.RequestConfig;
+import com.donkingliang.imageselector.model.BaseModel;
 import com.donkingliang.imageselector.model.ImageModel;
 import com.donkingliang.imageselector.utils.DateUtils;
-import com.donkingliang.imageselector.utils.ImageSelector;
+import com.donkingliang.imageselector.utils.MultiSelector;
 import com.donkingliang.imageselector.utils.ImageUtil;
 import com.donkingliang.imageselector.utils.UriUtils;
 import com.donkingliang.imageselector.utils.VersionUtils;
@@ -115,7 +116,7 @@ public class ImageSelectorActivity extends AppCompatActivity {
      */
     public static void openActivity(Activity activity, int requestCode, RequestConfig config) {
         Intent intent = new Intent(activity, ImageSelectorActivity.class);
-        intent.putExtra(ImageSelector.KEY_CONFIG, config);
+        intent.putExtra(MultiSelector.KEY_CONFIG, config);
         activity.startActivityForResult(intent, requestCode);
     }
 
@@ -128,7 +129,7 @@ public class ImageSelectorActivity extends AppCompatActivity {
      */
     public static void openActivity(Fragment fragment, int requestCode, RequestConfig config) {
         Intent intent = new Intent(fragment.getActivity(), ImageSelectorActivity.class);
-        intent.putExtra(ImageSelector.KEY_CONFIG, config);
+        intent.putExtra(MultiSelector.KEY_CONFIG, config);
         fragment.startActivityForResult(intent, requestCode);
     }
 
@@ -141,7 +142,7 @@ public class ImageSelectorActivity extends AppCompatActivity {
      */
     public static void openActivity(android.app.Fragment fragment, int requestCode, RequestConfig config) {
         Intent intent = new Intent(fragment.getActivity(), ImageSelectorActivity.class);
-        intent.putExtra(ImageSelector.KEY_CONFIG, config);
+        intent.putExtra(MultiSelector.KEY_CONFIG, config);
         fragment.startActivityForResult(intent, requestCode);
     }
 
@@ -149,7 +150,7 @@ public class ImageSelectorActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        RequestConfig config = intent.getParcelableExtra(ImageSelector.KEY_CONFIG);
+        RequestConfig config = intent.getParcelableExtra(MultiSelector.KEY_CONFIG);
         mMaxCount = config.maxSelectCount;
         isSingle = config.isSingle;
         canPreview = config.canPreview;
@@ -205,9 +206,9 @@ public class ImageSelectorActivity extends AppCompatActivity {
         btnPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<Image> images = new ArrayList<>();
-                images.addAll(mAdapter.getSelectImages());
-                toPreviewActivity(images, 0);
+                ArrayList<FileData> fileData = new ArrayList<>();
+                fileData.addAll(mAdapter.getSelectImages());
+                toPreviewActivity(fileData, 0);
             }
         });
 
@@ -274,13 +275,13 @@ public class ImageSelectorActivity extends AppCompatActivity {
         }
         mAdapter.setOnImageSelectListener(new ImageAdapter.OnImageSelectListener() {
             @Override
-            public void OnImageSelect(Image image, boolean isSelect, int selectCount) {
+            public void OnImageSelect(FileData fileData, boolean isSelect, int selectCount) {
                 setSelectImageCount(selectCount);
             }
         });
         mAdapter.setOnItemClickListener(new ImageAdapter.OnItemClickListener() {
             @Override
-            public void OnItemClick(Image image, int position) {
+            public void OnItemClick(FileData fileData, int position) {
                 toPreviewActivity(mAdapter.getData(), position);
             }
 
@@ -298,7 +299,7 @@ public class ImageSelectorActivity extends AppCompatActivity {
         if (mFolders != null && !mFolders.isEmpty()) {
             isInitFolder = true;
             rvFolder.setLayoutManager(new LinearLayoutManager(ImageSelectorActivity.this));
-            FolderAdapter adapter = new FolderAdapter(ImageSelectorActivity.this, mFolders);
+            FolderAdapter adapter = new FolderAdapter(ImageSelectorActivity.this, mFolders, R.string.selector_image_num);
             adapter.setOnFolderSelectListener(new FolderAdapter.OnFolderSelectListener() {
                 @Override
                 public void OnFolderSelect(Folder folder) {
@@ -334,7 +335,7 @@ public class ImageSelectorActivity extends AppCompatActivity {
             mFolder = folder;
             tvFolderName.setText(folder.getName());
             rvImage.scrollToPosition(0);
-            mAdapter.refresh(folder.getImages(), folder.isUseCamera());
+            mAdapter.refresh(folder.getFiles(), folder.isUseCamera());
         }
     }
 
@@ -423,9 +424,9 @@ public class ImageSelectorActivity extends AppCompatActivity {
      */
     private void changeTime() {
         int firstVisibleItem = getFirstVisibleItem();
-        Image image = mAdapter.getFirstVisibleImage(firstVisibleItem);
-        if (image != null) {
-            String time = DateUtils.getImageTime(this, image.getTime());
+        FileData fileData = mAdapter.getFirstVisibleImage(firstVisibleItem);
+        if (fileData != null) {
+            String time = DateUtils.getImageTime(this, fileData.getTime());
             tvTime.setText(time);
             showTime();
             mHideHandler.removeCallbacks(mHide);
@@ -442,10 +443,10 @@ public class ImageSelectorActivity extends AppCompatActivity {
             return;
         }
         //因为图片的实体类是Image，而我们返回的是String数组，所以要进行转换。
-        ArrayList<Image> selectImages = mAdapter.getSelectImages();
+        ArrayList<FileData> selectFileData = mAdapter.getSelectImages();
         ArrayList<String> images = new ArrayList<>();
-        for (Image image : selectImages) {
-            images.add(image.getPath());
+        for (FileData fileData : selectFileData) {
+            images.add(fileData.getPath());
         }
         saveImageAndFinish(images, false);
     }
@@ -459,14 +460,14 @@ public class ImageSelectorActivity extends AppCompatActivity {
 
     private void setResult(ArrayList<String> images, boolean isCameraImage) {
         Intent intent = new Intent();
-        intent.putStringArrayListExtra(ImageSelector.SELECT_RESULT, images);
-        intent.putExtra(ImageSelector.IS_CAMERA_IMAGE, isCameraImage);
+        intent.putStringArrayListExtra(MultiSelector.SELECT_RESULT, images);
+        intent.putExtra(MultiSelector.IS_FROM_CAMERA, isCameraImage);
         setResult(RESULT_OK, intent);
     }
 
-    private void toPreviewActivity(ArrayList<Image> images, int position) {
-        if (images != null && !images.isEmpty()) {
-            PreviewActivity.openActivity(this, images,
+    private void toPreviewActivity(ArrayList<FileData> fileData, int position) {
+        if (fileData != null && !fileData.isEmpty()) {
+            ImagePreviewActivity.openActivity(this, fileData,
                     mAdapter.getSelectImages(), isSingle, mMaxCount, position);
         }
     }
@@ -494,8 +495,8 @@ public class ImageSelectorActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ImageSelector.RESULT_CODE) {
-            if (data != null && data.getBooleanExtra(ImageSelector.IS_CONFIRM, false)) {
+        if (requestCode == MultiSelector.RESULT_CODE) {
+            if (data != null && data.getBooleanExtra(MultiSelector.IS_CONFIRM, false)) {
                 //如果用户在预览页点击了确定，就直接把用户选中的图片返回给用户。
                 confirm();
             } else {
@@ -592,6 +593,7 @@ public class ImageSelectorActivity extends AppCompatActivity {
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_WRITE_EXTERNAL_REQUEST_CODE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -621,7 +623,7 @@ public class ImageSelectorActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setTitle(R.string.selector_hint)
-                .setMessage(R.string.selector_permissions_hint)
+                .setMessage(R.string.selector_image_permissions_hint)
                 .setNegativeButton(R.string.selector_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -646,7 +648,7 @@ public class ImageSelectorActivity extends AppCompatActivity {
      * 从SDCard加载图片。
      */
     private void loadImageForSDCard() {
-        ImageModel.loadImageForSDCard(this, new ImageModel.DataCallback() {
+        ImageModel.loadImageForSDCard(this, new BaseModel.DataCallback() {
             @Override
             public void onSuccess(ArrayList<Folder> folders) {
                 mFolders = folders;

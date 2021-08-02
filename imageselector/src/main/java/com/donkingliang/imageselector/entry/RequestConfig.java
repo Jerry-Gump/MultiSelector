@@ -3,6 +3,8 @@ package com.donkingliang.imageselector.entry;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.donkingliang.imageselector.model.DocumentModel;
+
 import java.util.ArrayList;
 
 /**
@@ -22,6 +24,8 @@ public class RequestConfig implements Parcelable {
     public float cropRatio = 1.0f; // 图片剪切的宽高比，宽固定为手机屏幕的宽。
     public int requestCode;
 
+    public String suffix = "";
+    public String fileType = DocumentModel.FILE_TYPE_DOCUMENT;
 
     @Override
     public int describeContents() {

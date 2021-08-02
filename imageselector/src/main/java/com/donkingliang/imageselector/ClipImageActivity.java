@@ -14,7 +14,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.donkingliang.imageselector.entry.RequestConfig;
-import com.donkingliang.imageselector.utils.ImageSelector;
+import com.donkingliang.imageselector.utils.MultiSelector;
 import com.donkingliang.imageselector.utils.ImageUtil;
 import com.donkingliang.imageselector.utils.StringUtils;
 import com.donkingliang.imageselector.utils.VersionUtils;
@@ -40,7 +40,7 @@ public class ClipImageActivity extends Activity {
         setContentView(R.layout.activity_clip_image);
 
         Intent intent = getIntent();
-        RequestConfig config = intent.getParcelableExtra(ImageSelector.KEY_CONFIG);
+        RequestConfig config = intent.getParcelableExtra(MultiSelector.KEY_CONFIG);
         mRequestCode = config.requestCode;
         config.isSingle = true;
         config.maxSelectCount = 0;
@@ -90,8 +90,8 @@ public class ClipImageActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (data != null && requestCode == mRequestCode) {
-            ArrayList<String> images = data.getStringArrayListExtra(ImageSelector.SELECT_RESULT);
-            isCameraImage = data.getBooleanExtra(ImageSelector.IS_CAMERA_IMAGE, false);
+            ArrayList<String> images = data.getStringArrayListExtra(MultiSelector.SELECT_RESULT);
+            isCameraImage = data.getBooleanExtra(MultiSelector.IS_FROM_CAMERA, false);
             Bitmap bitmap = ImageUtil.decodeSampledBitmapFromFile(this, images.get(0), 720, 1080);
             if (bitmap != null) {
                 imageView.setBitmapData(bitmap);
@@ -117,8 +117,8 @@ public class ClipImageActivity extends Activity {
             ArrayList<String> selectImages = new ArrayList<>();
             selectImages.add(imagePath);
             Intent intent = new Intent();
-            intent.putStringArrayListExtra(ImageSelector.SELECT_RESULT, selectImages);
-            intent.putExtra(ImageSelector.IS_CAMERA_IMAGE, isCameraImage);
+            intent.putStringArrayListExtra(MultiSelector.SELECT_RESULT, selectImages);
+            intent.putExtra(MultiSelector.IS_FROM_CAMERA, isCameraImage);
             setResult(RESULT_OK, intent);
         }
         finish();
@@ -133,7 +133,7 @@ public class ClipImageActivity extends Activity {
      */
     public static void openActivity(Activity activity, int requestCode, RequestConfig config) {
         Intent intent = new Intent(activity, ClipImageActivity.class);
-        intent.putExtra(ImageSelector.KEY_CONFIG, config);
+        intent.putExtra(MultiSelector.KEY_CONFIG, config);
         activity.startActivityForResult(intent, requestCode);
     }
 
@@ -146,7 +146,7 @@ public class ClipImageActivity extends Activity {
      */
     public static void openActivity(Fragment fragment, int requestCode, RequestConfig config) {
         Intent intent = new Intent(fragment.getActivity(), ClipImageActivity.class);
-        intent.putExtra(ImageSelector.KEY_CONFIG, config);
+        intent.putExtra(MultiSelector.KEY_CONFIG, config);
         fragment.startActivityForResult(intent, requestCode);
     }
 
@@ -159,7 +159,7 @@ public class ClipImageActivity extends Activity {
      */
     public static void openActivity(android.app.Fragment fragment, int requestCode, RequestConfig config) {
         Intent intent = new Intent(fragment.getActivity(), ClipImageActivity.class);
-        intent.putExtra(ImageSelector.KEY_CONFIG, config);
+        intent.putExtra(MultiSelector.KEY_CONFIG, config);
         fragment.startActivityForResult(intent, requestCode);
     }
 }

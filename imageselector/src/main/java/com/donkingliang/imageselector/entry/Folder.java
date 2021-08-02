@@ -12,15 +12,15 @@ public class Folder {
 
     private boolean useCamera; // 是否可以调用相机拍照。只有“全部”文件夹才可以拍照
     private String name;
-    private ArrayList<Image> images;
+    private ArrayList<FileData> fileData;
 
     public Folder(String name) {
         this.name = name;
     }
 
-    public Folder(String name, ArrayList<Image> images) {
+    public Folder(String name, ArrayList<FileData> fileData) {
         this.name = name;
-        this.images = images;
+        this.fileData = fileData;
     }
 
     public String getName() {
@@ -31,12 +31,12 @@ public class Folder {
         this.name = name;
     }
 
-    public ArrayList<Image> getImages() {
-        return images;
+    public ArrayList<FileData> getFiles() {
+        return fileData;
     }
 
-    public void setImages(ArrayList<Image> images) {
-        this.images = images;
+    public void setFiles(ArrayList<FileData> fileData) {
+        this.fileData = fileData;
     }
 
     public boolean isUseCamera() {
@@ -47,12 +47,12 @@ public class Folder {
         this.useCamera = useCamera;
     }
 
-    public void addImage(Image image) {
-        if (image != null && StringUtils.isNotEmptyString(image.getPath())) {
-            if (images == null) {
-                images = new ArrayList<>();
+    public void addFile(FileData fileData) {
+        if (fileData != null && StringUtils.isNotEmptyString(fileData.getPath())) {
+            if (this.fileData == null) {
+                this.fileData = new ArrayList<>();
             }
-            images.add(image);
+            this.fileData.add(fileData);
         }
     }
 
@@ -60,7 +60,7 @@ public class Folder {
     public String toString() {
         return "Folder{" +
                 "name='" + name + '\'' +
-                ", images=" + images +
+                ", files=" + fileData +
                 '}';
     }
 }

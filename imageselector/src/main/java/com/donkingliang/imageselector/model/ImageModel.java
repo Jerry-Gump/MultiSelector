@@ -11,7 +11,7 @@ import android.provider.MediaStore;
 
 import com.donkingliang.imageselector.R;
 import com.donkingliang.imageselector.entry.Folder;
-import com.donkingliang.imageselector.entry.Image;
+import com.donkingliang.imageselector.entry.FileData;
 import com.donkingliang.imageselector.utils.ImageUtil;
 import com.donkingliang.imageselector.utils.StringUtils;
 import com.donkingliang.imageselector.utils.UriUtils;
@@ -85,7 +85,7 @@ public class ImageModel {
      * @param context
      * @param callback
      */
-    public static void loadImageForSDCard(final Context context, final DataCallback callback) {
+    public static void loadImageForSDCard(final Context context, final BaseModel.DataCallback callback) {
         loadImageForSDCard(context, false, callback);
     }
 
@@ -96,7 +96,7 @@ public class ImageModel {
      * @param isPreload 是否是预加载
      * @param callback
      */
-    private static void loadImageForSDCard(final Context context, final boolean isPreload, final DataCallback callback) {
+    private static void loadImageForSDCard(final Context context, final boolean isPreload, final BaseModel.DataCallback callback) {
         //由于扫描图片是耗时的操作，所以要在子线程处理。
         new Thread(new Runnable() {
             @Override
@@ -105,32 +105,32 @@ public class ImageModel {
                     String imageCacheDir = ImageUtil.getImageCacheDir(context);
                     ArrayList<Folder> folders = null;
                     if (cacheImageList == null || isPreload) {
-                        ArrayList<Image> imageList = loadImage(context);
-                        Collections.sort(imageList, new Comparator<Image>() {
+                        ArrayList<FileData> fileDataList = loadImage(context);
+                        Collections.sort(fileDataList, new Comparator<FileData>() {
                             @Override
-                            public int compare(Image image, Image t1) {
-                                if (image.getTime() > t1.getTime()) {
+                            public int compare(FileData fileData, FileData t1) {
+                                if (fileData.getTime() > t1.getTime()) {
                                     return 1;
-                                } else if (image.getTime() < t1.getTime()) {
+                                } else if (fileData.getTime() < t1.getTime()) {
                                     return -1;
                                 } else {
                                     return 0;
                                 }
                             }
                         });
-                        ArrayList<Image> images = new ArrayList<>();
+                        ArrayList<FileData> fileDatas = new ArrayList<>();
 
-                        for (Image image : imageList) {
+                        for (FileData fileData : fileDataList) {
                             // 过滤不存在或未下载完成的图片
-                            boolean exists = !"downloading".equals(getExtensionName(image.getPath())) && checkImgExists(image.getPath());
+                            boolean exists = !"downloading".equals(getExtensionName(fileData.getPath())) && checkImgExists(fileData.getPath());
                             //过滤剪切保存的图片；
-                            boolean isCutImage = ImageUtil.isCutImage(imageCacheDir, image.getPath());
+                            boolean isCutImage = ImageUtil.isCutImage(imageCacheDir, fileData.getPath());
                             if (!isCutImage && exists) {
-                                images.add(image);
+                                fileDatas.add(fileData);
                             }
                         }
-                        Collections.reverse(images);
-                        folders = splitFolder(context, images);
+                        Collections.reverse(fileDatas);
+                        folders = splitFolder(context, fileDatas);
                         if (isNeedCache) {
                             cacheImageList = folders;
                         }
@@ -152,8 +152,7 @@ public class ImageModel {
      * @param context
      * @return
      */
-    private static synchronized ArrayList<Image> loadImage(Context context) {
-
+    private static synchronized ArrayList<FileData> loadImage(Context context) {
         //扫描图片
         Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         ContentResolver mContentResolver = context.getContentResolver();
@@ -169,7 +168,7 @@ public class ImageModel {
                 null,
                 MediaStore.Images.Media.DATE_ADDED + " DESC");
 
-        ArrayList<Image> images = new ArrayList<>();
+        ArrayList<FileData> fileData = new ArrayList<>();
 
         //读取扫描到的图片
         if (mCursor != null) {
@@ -197,11 +196,11 @@ public class ImageModel {
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
                         .appendPath(String.valueOf(id)).build();
 
-                images.add(new Image(path, time, name, mimeType, uri));
+                fileData.add(new FileData(path, time, name, mimeType, uri));
             }
             mCursor.close();
         }
-        return images;
+        return fileData;
     }
 
     /**
@@ -222,21 +221,21 @@ public class ImageModel {
     /**
      * 把图片按文件夹拆分，第一个文件夹保存所有的图片
      *
-     * @param images
+     * @param fileData
      * @return
      */
-    private static ArrayList<Folder> splitFolder(Context context, ArrayList<Image> images) {
+    private static ArrayList<Folder> splitFolder(Context context, ArrayList<FileData> fileData) {
         ArrayList<Folder> folders = new ArrayList<>();
-        folders.add(new Folder(context.getString(R.string.selector_all_image), images));
+        folders.add(new Folder(context.getString(R.string.selector_all_image), fileData));
 
-        if (images != null && !images.isEmpty()) {
-            int size = images.size();
+        if (fileData != null && !fileData.isEmpty()) {
+            int size = fileData.size();
             for (int i = 0; i < size; i++) {
-                String path = images.get(i).getPath();
+                String path = fileData.get(i).getPath();
                 String name = getFolderName(path);
                 if (StringUtils.isNotEmptyString(name)) {
                     Folder folder = getFolder(name, folders);
-                    folder.addImage(images.get(i));
+                    folder.addFile(fileData.get(i));
                 }
             }
         }
@@ -285,10 +284,6 @@ public class ImageModel {
         Folder newFolder = new Folder(name);
         folders.add(newFolder);
         return newFolder;
-    }
-
-    public interface DataCallback {
-        void onSuccess(ArrayList<Folder> folders);
     }
 
     private static class PhotoContentObserver extends ContentObserver {

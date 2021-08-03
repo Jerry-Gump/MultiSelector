@@ -15,7 +15,11 @@ import com.donkingliang.imageselector.R;
 import com.donkingliang.imageselector.entry.FileData;
 import com.donkingliang.imageselector.utils.VersionUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class SelectorBaseAdapter<VH extends SelectorBaseAdapter.SelectorViewHolder> extends RecyclerView.Adapter<VH>{
 
@@ -259,5 +263,11 @@ public class SelectorBaseAdapter<VH extends SelectorBaseAdapter.SelectorViewHold
     public static int px2dip(Context context, float pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
+    }
+
+    public static String dateString(long time){
+        Date d = new Date(time);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        return sdf.format(d);
     }
 }

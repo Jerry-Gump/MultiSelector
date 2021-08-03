@@ -184,6 +184,7 @@ public class ImageModel {
                 long time = mCursor.getLong(
                         mCursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
 
+                long size = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE));
                 if (String.valueOf(time).length() < 13) {
                     time *= 1000;
                 }
@@ -196,7 +197,7 @@ public class ImageModel {
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
                         .appendPath(String.valueOf(id)).build();
 
-                fileData.add(new FileData(path, time, name, mimeType, uri));
+                fileData.add(new FileData(path, time, name, mimeType, uri, size));
             }
             mCursor.close();
         }

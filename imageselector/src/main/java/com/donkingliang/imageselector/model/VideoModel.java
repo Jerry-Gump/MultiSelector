@@ -219,6 +219,7 @@ public class VideoModel {
                     time *= 1000;
                 }
 
+                long size = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE));
                 //获取图片类型
                 String mimeType = mCursor.getString(
                         mCursor.getColumnIndex(MediaStore.Video.Media.MIME_TYPE));
@@ -228,7 +229,7 @@ public class VideoModel {
                         .appendPath(String.valueOf(id)).build();
 
                 long duration = mCursor.getLong(mCursor.getColumnIndexOrThrow(DURATION));
-                FileData fd = new FileData(path, time, name, mimeType, uri);
+                FileData fd = new FileData(path, time, name, mimeType, uri, size);
                 fd.setDuration(duration);
 
                 fileData.add(fd);

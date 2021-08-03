@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import com.donkingliang.imageselector.R;
 import com.donkingliang.imageselector.entry.FileData;
 
+import java.util.Locale;
+
 public class DocumentAdapter extends SelectorBaseAdapter<DocumentAdapter.ViewHolder> {
 
     private boolean canPreview;
@@ -82,6 +84,8 @@ public class DocumentAdapter extends SelectorBaseAdapter<DocumentAdapter.ViewHol
         } else {
             holder.tvTitle.setLines(1);
         }*/
+        holder.tvDate.setText(dateString(fileData.getTime()));
+        holder.tvSize.setText(sizeString(fileData.getSize()));
 
         if (isExcel(fileData.getMimeType())) {
             holder.icFile.setImageResource(R.drawable.vw_ic_excel);
@@ -141,11 +145,38 @@ public class DocumentAdapter extends SelectorBaseAdapter<DocumentAdapter.ViewHol
     static class ViewHolder extends SelectorBaseAdapter.SelectorViewHolder {
         TextView tvTitle;
         ImageView icFile;
+        TextView tvDate;
+        TextView tvSize;
 
         public ViewHolder(View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tv_title);
             icFile = itemView.findViewById(R.id.ic_file);
+            tvDate = itemView.findViewById(R.id.tv_date);
+            tvSize = itemView.findViewById(R.id.tv_size);
         }
+    }
+
+    private String sizeString(long size){
+        String un = "KB";
+        long b = size / 1024;
+        if(size % 1024 != 0){
+            b++;
+        }
+        if(b >= 1024){
+            un = "MB";
+            b = b / 1024;
+            if(b % 1024 != 0){
+                b++;
+            }
+        }
+        if(b >= 1024){
+            un = "GB";
+            b = b / 1024;
+            if(b % 1024 != 0){
+                b++;
+            }
+        }
+        return String.format(Locale.getDefault(),"%d %s",b, un);
     }
 }

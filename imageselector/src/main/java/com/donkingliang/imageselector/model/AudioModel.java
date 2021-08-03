@@ -181,6 +181,7 @@ public class AudioModel {
                 if (String.valueOf(time).length() < 13) {
                     time *= 1000;
                 }
+                long size = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
 
                 //获取图片类型
                 String mimeType = mCursor.getString(
@@ -191,7 +192,7 @@ public class AudioModel {
                         .appendPath(String.valueOf(id)).build();
                 
                 long duration = mCursor.getLong(mCursor.getColumnIndexOrThrow(DURATION));
-                FileData fd = new FileData(path, time, name, mimeType, uri);
+                FileData fd = new FileData(path, time, name, mimeType, uri, size);
                 fd.setDuration(duration);
 
                 fileData.add(fd);

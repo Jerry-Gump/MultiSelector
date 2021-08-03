@@ -15,13 +15,15 @@ public class FileData implements Parcelable {
     private String mimeType;
     private Uri uri;
     private long duration;
+    private long size;
 
-    public FileData(String path, long time, String name, String mimeType, Uri uri) {
+    public FileData(String path, long time, String name, String mimeType, Uri uri, long size) {
         this.path = path;
         this.time = time;
         this.name = name;
         this.mimeType = mimeType;
         this.uri = uri;
+        this.size = size;
     }
 
     public Uri getUri() {
@@ -73,6 +75,8 @@ public class FileData implements Parcelable {
     public void setDuration(long duration) {
         this.duration = duration;
     }
+    public long getSize(){return size;}
+    public void setSize(long size){this.size=size;}
 
     @Override
     public int describeContents() {
@@ -86,6 +90,8 @@ public class FileData implements Parcelable {
         dest.writeString(this.name);
         dest.writeString(this.mimeType);
         dest.writeParcelable(this.uri, flags);
+        dest.writeLong(this.duration);
+        dest.writeLong(this.size);
     }
 
     protected FileData(Parcel in) {
@@ -94,6 +100,8 @@ public class FileData implements Parcelable {
         this.name = in.readString();
         this.mimeType = in.readString();
         this.uri = in.readParcelable(Uri.class.getClassLoader());
+        this.duration = in.readLong();
+        this.size = in.readLong();
     }
 
     public static final Creator<FileData> CREATOR = new Creator<FileData>() {

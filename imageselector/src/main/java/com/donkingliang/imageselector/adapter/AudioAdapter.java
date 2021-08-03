@@ -54,6 +54,7 @@ public class AudioAdapter extends SelectorBaseAdapter<AudioAdapter.ViewHolder> {
         }*/
         
         setItemSelect(holder, mSelectFileData.contains(fileData));
+        holder.tvDate.setText(dateString(fileData.getTime()));
 
         //点击选中/取消选中图片
         holder.ivSelectIcon.setOnClickListener(new View.OnClickListener() {
@@ -84,11 +85,13 @@ public class AudioAdapter extends SelectorBaseAdapter<AudioAdapter.ViewHolder> {
     static class ViewHolder extends SelectorBaseAdapter.SelectorViewHolder {
         TextView tvTitle;
         TextView tvDuration;
+        TextView tvDate;
 
         public ViewHolder(View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tv_title);
             tvDuration = itemView.findViewById(R.id.tv_duration);
+            tvDate = itemView.findViewById(R.id.tv_date);
         }
     }
 }

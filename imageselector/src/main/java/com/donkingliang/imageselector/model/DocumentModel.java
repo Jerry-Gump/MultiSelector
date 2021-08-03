@@ -245,6 +245,8 @@ public class DocumentModel {
                     time *= 1000;
                 }
 
+                long size = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE));
+
                 //获取图片类型
                 String mimeType = mCursor.getString(
                         mCursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE));
@@ -253,7 +255,7 @@ public class DocumentModel {
                 Uri uri = mSourceUri.buildUpon()
                         .appendPath(String.valueOf(id)).build();
 
-                fileData.add(new FileData(path, time, name, mimeType, uri));
+                fileData.add(new FileData(path, time, name, mimeType, uri,size));
             }
             mCursor.close();
         }

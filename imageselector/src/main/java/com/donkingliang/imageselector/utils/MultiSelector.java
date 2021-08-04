@@ -10,8 +10,10 @@ import com.donkingliang.imageselector.ClipImageActivity;
 import com.donkingliang.imageselector.DocumentSelectorActivity;
 import com.donkingliang.imageselector.ImageSelectorActivity;
 import com.donkingliang.imageselector.VideoSelectorActivity;
+import com.donkingliang.imageselector.entry.FilePreviewListener;
 import com.donkingliang.imageselector.entry.RequestConfig;
 import com.donkingliang.imageselector.model.AudioModel;
+import com.donkingliang.imageselector.model.DocumentModel;
 import com.donkingliang.imageselector.model.ImageModel;
 import com.donkingliang.imageselector.model.VideoModel;
 
@@ -64,6 +66,9 @@ public class MultiSelector {
         VideoModel.preloadAndRegisterContentObserver(context);
         AudioModel.preloadAndRegisterContentObserver(context);
     }
+    public static void preloadDocument(Context context, String fileType, String suffix){
+        DocumentModel.preloadAndRegisterContentObserver(context, fileType, suffix);
+    }
 
     /**
      * 清空缓存
@@ -72,6 +77,7 @@ public class MultiSelector {
         ImageModel.clearCache(context);
         VideoModel.clearCache(context);
         AudioModel.clearCache(context);
+        DocumentModel.clearCache(context);
     }
 
     public static MultiSelectorBuilder builder() {
@@ -179,6 +185,21 @@ public class MultiSelector {
          */
         public MultiSelectorBuilder setSelected(ArrayList<String> selected) {
             config.selected = selected;
+            return this;
+        }
+
+        public MultiSelectorBuilder setSuffix(String suffix){
+            config.suffix = suffix;
+            return this;
+        }
+
+        public MultiSelectorBuilder setFileType(String fileType){
+            config.fileType = fileType;
+            return this;
+        }
+
+        public MultiSelectorBuilder setPreviewListener(FilePreviewListener listener){
+            config.previewListener = listener;
             return this;
         }
 

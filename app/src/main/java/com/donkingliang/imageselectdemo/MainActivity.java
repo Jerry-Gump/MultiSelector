@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import com.donkingliang.imageselectdemo.adapter.ImageAdapter;
+import com.donkingliang.imageselector.model.DocumentModel;
 import com.donkingliang.imageselector.utils.MultiSelector;
 
 import java.util.ArrayList;
@@ -106,10 +107,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setSingle(false)  //设置是否单选
                         .canPreview(true) //是否点击放大图片查看,，默认为true
                         .setMaxSelectCount(9) // 图片的最大选择数量，小于等于0时，不限数量。
+                        .setFileType(DocumentModel.FILE_TYPE_DOCUMENT)
+                        .setSuffix("doc,xls")
                         //.start(this, MultiSelector.SELECT_TYPE_IMAGE, REQUEST_CODE); // 打开相册
-                        //.start(this, MultiSelector.SELECT_TYPE_VIDEO, REQUEST_CODE); // 打开相册
-                        .start(this, MultiSelector.SELECT_TYPE_DOCUMENT, REQUEST_CODE);
-                        //.start(this, MultiSelector.SELECT_TYPE_AUDIO, REQUEST_CODE);
+                        //.start(this, MultiSelector.SELECT_TYPE_VIDEO, REQUEST_CODE); // 视频选择
+                        .start(this, MultiSelector.SELECT_TYPE_DOCUMENT, REQUEST_CODE);//文档选择
+                        //.start(this, MultiSelector.SELECT_TYPE_AUDIO, REQUEST_CODE);// 音频选择
                 break;
 
             case R.id.btn_unlimited:

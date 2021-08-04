@@ -1,5 +1,35 @@
 # MultiSelector
-准备在此基础上增加视频选择和文档选择两种类型。自己原来有一个，来自项目：https://github.com/fishwjy/MultiType-FilePicker ，但这个有段时间没有维护了，界面设计上关于目录的部分也不理想，对Android10的支持有问题（不记得自己得到的版本时间了，现在的这个有没有改善）。既然要处理Android10支持，干脆就自己扩展一个出来吧。
+在ImageSelector项目基础上做了扩展，增加了音频、视频、普通文件的选择器。原来使用的是另一个，来自项目：https://github.com/fishwjy/MultiType-FilePicker ，但这个有段时间没有维护了，界面设计上关于目录的部分也不理想，自己修修补补很多次，对Android10的支持有问题（不记得自己得到的版本时间了，现在的这个有没有改善）。既然要处理Android10支持，干脆就自己扩展一个出来吧。这个MultiSelector参考了部分filepicker的设计，感谢！
+
+大部分接口延续imageselector，在start部分，增加了类型参数：
+    //多选(最多9张)
+    MultiSelector.builder()
+            .useCamera(true) // 设置是否使用拍照
+            .setSingle(false)  //设置是否单选
+            .canPreview(true) //是否点击放大图片查看,，默认为true
+            .setMaxSelectCount(9) // 图片的最大选择数量，小于等于0时，不限数量。
+            .setFileType(DocumentModel.FILE_TYPE_DOCUMENT) // MultiSelector.SELECT_TYPE_DOCUMENT 有效
+            .setSuffix("doc,xls") // MultiSelector.SELECT_TYPE_DOCUMENT 有效
+            //.start(this, MultiSelector.SELECT_TYPE_IMAGE, REQUEST_CODE); // 打开相册
+            //.start(this, MultiSelector.SELECT_TYPE_VIDEO, REQUEST_CODE); // 视频选择
+            .start(this, MultiSelector.SELECT_TYPE_DOCUMENT, REQUEST_CODE);//文档选择
+            //.start(this, MultiSelector.SELECT_TYPE_AUDIO, REQUEST_CODE);// 音频选择
+
+关于文档选择，有两个特有配置量，其他选择器忽略此配置：
+    MultiSelector.builder()
+            .setFileType(DocumentModel.FILE_TYPE_DOCUMENT) // 文件选择大类型，有FILE_TYPE_ALL 全部类型，FILE_TYPE_DOCUMENT 文档类型（30以下设置为doc、docx、xls、xlsx、ppt、pptx、pdf、txt）,FILE_TYPE_CUSTOM 自定义（具体类型根据suffix确定）,FILE_TYPE_NONE 非媒体类型（音视频、图片之外），四个选项
+            .setSuffix("doc,xls") // 只在fileType设置为FILE_TYPE_CUSTOM时起作用，指定一个或多个后缀名
+
+图片预览没有做任何改变，依然使用imageselector的方式；图片之外预览的处理，考虑轻量化因素，没加入自带的音视频播放和文件预览功能，如果打开预览配置，并且未通过接口自定义预览处理的话，将直接通过Intent.ACTION_VIEW抛给默认处理程序处理；以下为设置预览处理接口：
+    MultiSelector.builder()
+                .setPreviewListener(new FilePreviewListener(){
+                    @Override
+                    public void onPreview(Context context, FileData fileData){
+                        // 自己调用合适的Activity或者别的Intent实现自定义预览
+                    }
+                })
+
+从兼容与沿革的方向考虑，目前除了有冲突的地方，其他的imageselector的部分没做任何改变，也没与其他Activity和Model等做代码同步，保持独立。
 
 # ImageSelector
 Android图片选择器，仿微信的图片选择器的样式和效果。支持图片的单选、限数量的多选和不限数量的多选。支持图片预览和图片文件夹的切换。支持在选择图片时调用相机拍照，也支持不用打开相册直接调用相机拍照。

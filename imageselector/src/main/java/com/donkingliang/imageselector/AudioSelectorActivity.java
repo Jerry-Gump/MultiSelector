@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 import com.donkingliang.imageselector.adapter.AudioAdapter;
 import com.donkingliang.imageselector.adapter.SelectorBaseAdapter;
 import com.donkingliang.imageselector.entry.FileData;
+import com.donkingliang.imageselector.entry.FilePreviewListener;
 import com.donkingliang.imageselector.entry.Folder;
 import com.donkingliang.imageselector.entry.RequestConfig;
 import com.donkingliang.imageselector.model.AudioModel;
@@ -26,9 +27,6 @@ import com.donkingliang.imageselector.utils.MultiSelector;
 import java.util.ArrayList;
 
 public class AudioSelectorActivity extends BaseSelectorActivity {
-
-    private FrameLayout btnPreview;
-
     /**
      * 启动图片选择器
      *
@@ -85,7 +83,6 @@ public class AudioSelectorActivity extends BaseSelectorActivity {
     @Override
     protected void initView(){
         super.initView();
-        btnPreview = findViewById(R.id.btn_preview);
     }
 
     @Override
@@ -97,7 +94,11 @@ public class AudioSelectorActivity extends BaseSelectorActivity {
                 ArrayList<FileData> fileData = new ArrayList<>();
                 fileData.addAll(mAdapter.getSelectFiles());
                 if(fileData.size()>0) {
-                    openAudioFile(fileData.get(0));
+                    if(mPreviewListener != null){
+                        mPreviewListener.onPreview(AudioSelectorActivity.this, fileData.get(0));
+                    }else {
+                        openAudioFile(fileData.get(0));
+                    }
                 }
             }
         });
@@ -141,7 +142,13 @@ public class AudioSelectorActivity extends BaseSelectorActivity {
         mAdapter.setOnItemClickListener(new SelectorBaseAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(FileData fileData, int position) {
-                openAudioFile(fileData);
+                if(canPreview) {
+                    if (mPreviewListener != null) {
+                        mPreviewListener.onPreview(AudioSelectorActivity.this, fileData);
+                    } else {
+                        openAudioFile(fileData);
+                    }
+                }
             }
 
             @Override

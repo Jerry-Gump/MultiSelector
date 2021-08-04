@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.donkingliang.imageselector.adapter.FolderAdapter;
 import com.donkingliang.imageselector.adapter.SelectorBaseAdapter;
 import com.donkingliang.imageselector.entry.FileData;
+import com.donkingliang.imageselector.entry.FilePreviewListener;
 import com.donkingliang.imageselector.entry.Folder;
 import com.donkingliang.imageselector.entry.RequestConfig;
 import com.donkingliang.imageselector.utils.DateUtils;
@@ -52,6 +53,8 @@ public abstract class BaseSelectorActivity extends AppCompatActivity {
     protected RecyclerView rvFolder;
     protected View masking;
 
+    protected FrameLayout btnPreview;
+
     protected SelectorBaseAdapter mAdapter;
     protected GridLayoutManager mLayoutManager;
 
@@ -69,6 +72,7 @@ public abstract class BaseSelectorActivity extends AppCompatActivity {
     protected boolean canPreview = true;
     protected int mMaxCount;
 
+    protected FilePreviewListener mPreviewListener = null;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +82,7 @@ public abstract class BaseSelectorActivity extends AppCompatActivity {
         isSingle = config.isSingle;
         canPreview = config.canPreview;
         mSelectedFiles = config.selected;
+        mPreviewListener = config.previewListener;
     }
 
     /**
@@ -171,6 +176,14 @@ public abstract class BaseSelectorActivity extends AppCompatActivity {
         tvFolderName = findViewById(R.id.tv_folder_name);
         tvTime = findViewById(R.id.tv_time);
         masking = findViewById(R.id.masking);
+        btnPreview = findViewById(R.id.btn_preview);
+        if(!canPreview){
+            btnPreview.setVisibility(View.GONE);
+            View v = findViewById(R.id.v_divider);
+            if(v!= null) {
+                v.setVisibility(View.GONE);
+            }
+        }
     }
 
     protected void initListener() {

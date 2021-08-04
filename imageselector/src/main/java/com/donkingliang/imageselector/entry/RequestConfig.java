@@ -27,6 +27,8 @@ public class RequestConfig implements Parcelable {
     public String suffix = "";
     public String fileType = DocumentModel.FILE_TYPE_DOCUMENT;
 
+    public FilePreviewListener previewListener = null;
+
     @Override
     public int describeContents() {
         return 0;
@@ -43,6 +45,8 @@ public class RequestConfig implements Parcelable {
         dest.writeStringList(this.selected);
         dest.writeFloat(this.cropRatio);
         dest.writeInt(this.requestCode);
+        dest.writeString(this.suffix);
+        dest.writeString(this.fileType);
     }
 
     public RequestConfig() {
@@ -58,6 +62,8 @@ public class RequestConfig implements Parcelable {
         this.selected = in.createStringArrayList();
         this.cropRatio = in.readFloat();
         this.requestCode = in.readInt();
+        this.suffix = in.readString();
+        this.fileType = in.readString();
     }
 
     public static final Creator<RequestConfig> CREATOR = new Creator<RequestConfig>() {

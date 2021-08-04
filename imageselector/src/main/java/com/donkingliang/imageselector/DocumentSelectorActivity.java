@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 import com.donkingliang.imageselector.adapter.DocumentAdapter;
 import com.donkingliang.imageselector.adapter.SelectorBaseAdapter;
 import com.donkingliang.imageselector.entry.FileData;
+import com.donkingliang.imageselector.entry.FilePreviewListener;
 import com.donkingliang.imageselector.entry.Folder;
 import com.donkingliang.imageselector.entry.RequestConfig;
 import com.donkingliang.imageselector.model.BaseModel;
@@ -27,7 +29,6 @@ import java.util.ArrayList;
 
 public class DocumentSelectorActivity extends BaseSelectorActivity {
 
-    private FrameLayout btnPreview;
     private String fileType = DocumentModel.FILE_TYPE_DOCUMENT;
     private String suffix = "";
 
@@ -91,28 +92,38 @@ public class DocumentSelectorActivity extends BaseSelectorActivity {
     @Override
     protected void initView(){
         super.initView();
-        btnPreview = findViewById(R.id.btn_preview);
     }
 
     @Override
     protected void initListener() {
         super.initListener();
+
         btnPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ArrayList<FileData> fileData = new ArrayList<>();
                 fileData.addAll(mAdapter.getSelectFiles());
                 if(fileData.size()>0) {
-                    openDocumentFile(fileData.get(0));
+                    if(mPreviewListener != null){
+                        mPreviewListener.onPreview(DocumentSelectorActivity.this, fileData.get(0));
+                    }else {
+                        openDocumentFile(fileData.get(0));
+                    }
                 }
             }
         });
     }
 
     private void openDocumentFile(FileData fileData){
+        Intent intent=new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri= fileData.getUri();
+        intent.setDataAndType(uri, fileData.getMimeType());
+        startActivity(intent);
+        /*
         Intent intent=new Intent(this, FilePreviewActivity.class);
         intent.putExtra(FilePreviewActivity.FILE_DATA, fileData);
-        startActivity(intent);
+        startActivity(intent);*/
     }
 
     /**
@@ -147,6 +158,13 @@ public class DocumentSelectorActivity extends BaseSelectorActivity {
             public void OnItemClick(FileData fileData, int position) {
                 // 视频暂时不考虑预览，而应该尝试启用第三方播放应用，因为这个播放多种格式视频需要用到ffmpeg，规模太大了，不适应这个轻量化的思路
                 //toPreviewActivity(mAdapter.getData(), position);
+                if(canPreview) {
+                    if (mPreviewListener != null) {
+                        mPreviewListener.onPreview(DocumentSelectorActivity.this, fileData);
+                    }else{
+                        openDocumentFile(fileData);
+                    }
+                }
             }
 
             @Override

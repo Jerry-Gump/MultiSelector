@@ -54,8 +54,6 @@ public class VideoSelectorActivity  extends BaseSelectorActivity {
     private boolean useCamera = true;
     private boolean onlyTakePhoto = false;
 
-    private FrameLayout btnPreview;
-
     /**
      * 启动图片选择器
      *
@@ -120,7 +118,6 @@ public class VideoSelectorActivity  extends BaseSelectorActivity {
     @Override
     protected void initView() {
         super.initView();
-        btnPreview = findViewById(R.id.btn_preview);
     }
 
     @Override
@@ -132,7 +129,11 @@ public class VideoSelectorActivity  extends BaseSelectorActivity {
                 ArrayList<FileData> fileData = new ArrayList<>();
                 fileData.addAll(mAdapter.getSelectFiles());
                 if(fileData.size()>0) {
-                    openVideoFile(fileData.get(0));
+                    if(mPreviewListener != null){
+                        mPreviewListener.onPreview(VideoSelectorActivity.this, fileData.get(0));
+                    }else {
+                        openVideoFile(fileData.get(0));
+                    }
                 }
             }
         });
@@ -176,9 +177,12 @@ public class VideoSelectorActivity  extends BaseSelectorActivity {
             @Override
             public void OnItemClick(FileData fileData, int position) {
                 // 视频暂时不考虑预览，而应该尝试启用第三方播放应用，因为这个播放多种格式视频需要用到ffmpeg，规模太大了，不适应这个轻量化的思路
-                //toPreviewActivity(mAdapter.getData(), position);
-                if(fileData != null){
-                    openVideoFile(fileData);
+                if(canPreview) {
+                    if (mPreviewListener != null) {
+                        mPreviewListener.onPreview(VideoSelectorActivity.this, fileData);
+                    } else {
+                        openVideoFile(fileData);
+                    }
                 }
             }
 
